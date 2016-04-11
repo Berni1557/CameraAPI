@@ -10,6 +10,7 @@ KinectV2::~KinectV2()
 {
 }
 
+
 int KinectV2::init(std::string cameraname, int cameraNumber, CameraInterfaceEnum camInterface)
 {
 	

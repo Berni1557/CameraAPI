@@ -32,6 +32,7 @@
 #include "CamProperties.h"
 #include <opencv2/core/core.hpp>
 #include "CameraAPI.h"
+#include <conio.h>
 
 class CameraAPI;
 // interface

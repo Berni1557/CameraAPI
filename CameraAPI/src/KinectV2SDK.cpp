@@ -41,65 +41,6 @@ int KinectV2SDK::init()
 	CHECKERROR(colorFrameSource->OpenReader(&colorFrameReader));
 	SAFERELEASE(colorFrameSource);
 
-	//BodyFrame Bf = IBodyFrame();
-
-	/*
-	while (colorFrameReader) {
-		processIncomingData(colorFrameReader);
-		int key = cv::waitKey(10);
-		if (key == 'q') {
-			break;
-		}
-	}
-	*/
-
-	// de-initialize Kinect Sensor
-	//CHECKERROR(kinectSensor->Close());
-	//SAFERELEASE(kinectSensor);
-
-	/*
-	//this->getCalibIntelRealsenseF200();
-
-	std::cout << "Intel Realsense SDK Hacking using Opencv" << std::endl;
-	std::cout << "Intel Realsense Camera SDK Frame Capture in opencv Mat Variable       -- by Deepak" << std::endl;
-	std::cout << "Compiled with OpenCV version " << CV_VERSION << std::endl;
-
-	psm = 0;
-	psm = PXCSenseManager::CreateInstance();
-
-	if (!psm) {
-		wprintf_s(L"Unable to create the PXCSenseManager\n");
-		//return 1;
-	}
-
-	psm->EnableStream(PXCCapture::STREAM_TYPE_COLOR, 640, 480); //depth resolution
-	psm->EnableStream(PXCCapture::STREAM_TYPE_DEPTH, 640, 480); //depth resolution
-	psm->Init();
-
-	// create Properties
-	this->createProperties();
-
-	// set Properties
-	this->setProperties();
-
-	///////////// OPENCV
-	image = 0;
-	CvSize gab_size;
-	gab_size.height = 480;
-	gab_size.width = 640;
-	image = cvCreateImage(gab_size, 8, 3);
-
-	depth = 0;
-	CvSize gab_size_depth;
-	gab_size_depth.height = 240;
-	gab_size_depth.width = 320;
-	depth = cvCreateImage(gab_size, 8, 1);
-
-	PXCImage::ImageInfo rgb_info;
-	PXCImage::ImageInfo depth_info;
-
-	//cv::namedWindow("Mwindow", cv::WINDOW_AUTOSIZE);
-	*/
 	return 0;
 }
 
@@ -110,8 +51,9 @@ int KinectV2SDK::aquistion()
 	int m;
 	while (colorFrameReader) {
 		m=colorFrameReaderToMat(rgb);
-		int key = cv::waitKey(10);
-		if (key == 'q') {
+		bool k = kbhit();
+		int key = cv::waitKey(1000);
+		if (k) {
 			break;
 		}
 		if (m == 0) {
@@ -120,6 +62,7 @@ int KinectV2SDK::aquistion()
 			//this->drawSkeleton(rgb);
 
 			this->icameraRGB->onframe(rgb);
+
 		}
 	}
 	return 0;
@@ -290,6 +233,7 @@ int KinectV2SDK::drawSkeleton(cv::Mat& image)
 
 	}
 
+
 	while (1) {
 		// Frame
 		IColorFrame* pColorFrame = nullptr;
@@ -432,11 +376,12 @@ KinectV2SDKRGB::~KinectV2SDKRGB()
 
 int KinectV2SDKRGB::init()
 {
-	/*
-	HRESULT hr;
-	IKinectSensor* kinectSensor = nullptr;     // kinect sensor
+	// Kinect V2 to OpenCV
 
-											   // initialize Kinect Sensor
+	HRESULT hr;
+	kinectSensor = nullptr;     // kinect sensor
+
+								// initialize Kinect Sensor
 	hr = GetDefaultKinectSensor(&kinectSensor);
 	if (FAILED(hr) || !kinectSensor) {
 		std::cout << "ERROR hr=" << hr << "; sensor=" << kinectSensor << std::endl;
@@ -449,7 +394,6 @@ int KinectV2SDKRGB::init()
 	CHECKERROR(kinectSensor->get_ColorFrameSource(&colorFrameSource));
 	CHECKERROR(colorFrameSource->OpenReader(&colorFrameReader));
 	SAFERELEASE(colorFrameSource);
-	*/
 	return 0;
 }
 
@@ -508,6 +452,9 @@ int KinectV2SDKRGB::close()
 
 int KinectV2SDKRGB::onframe(cv::Mat & image)
 {
+	//IntrinsicParameter IP;
+	//this->getSDKCalibrationModel(IP);
+
 	return this->cameraapi->onframe(image);
 }
 
@@ -546,6 +493,7 @@ int KinectV2SDKRGB::setProperty(std::string name, boost::any value)
 	return -1;
 }
 
+
 KinectV2SDKDepth::KinectV2SDKDepth()
 {
 }
@@ -562,45 +510,24 @@ KinectV2SDKDepth::~KinectV2SDKDepth()
 
 int KinectV2SDKDepth::init()
 {
-	/*
-	std::cout << "Intel Realsense SDK Hacking using Opencv" << std::endl;
-	std::cout << "Intel Realsense Camera SDK Frame Capture in opencv Mat Variable       -- by Deepak" << std::endl;
-	std::cout << "Compiled with OpenCV version " << CV_VERSION << std::endl;
+	// Kinect V2 to OpenCV
 
-	psm = 0;
-	psm = PXCSenseManager::CreateInstance();
+	HRESULT hr;
+	kinectSensor = nullptr;     // kinect sensor
 
-	if (!psm) {
-		wprintf_s(L"Unable to create the PXCSenseManager\n");
-		//return 1;
+								// initialize Kinect Sensor
+	hr = GetDefaultKinectSensor(&kinectSensor);
+	if (FAILED(hr) || !kinectSensor) {
+		std::cout << "ERROR hr=" << hr << "; sensor=" << kinectSensor << std::endl;
+		return -1;
 	}
+	CHECKERROR(kinectSensor->Open());
 
-	psm->EnableStream(PXCCapture::STREAM_TYPE_DEPTH, 640, 480); //depth resolution
-	psm->Init();
-
-	// create Properties
-	this->createProperties();
-
-	// set Properties
-	this->setProperties();
-
-	///////////// OPENCV
-
-	CvSize gab_size;
-	gab_size.height = 480;
-	gab_size.width = 640;
-
-	depth = 0;
-	CvSize gab_size_depth;
-	gab_size_depth.height = 240;
-	gab_size_depth.width = 320;
-	depth = cvCreateImage(gab_size, 8, 1);
-
-	PXCImage::ImageInfo rgb_info;
-	PXCImage::ImageInfo depth_info;
-
-	//cv::namedWindow("Mwindow", cv::WINDOW_AUTOSIZE);
-	*/
+	// initialize color frame reader
+	IDepthFrameSource* depthFrameSource = nullptr; // color source
+	CHECKERROR(kinectSensor->get_DepthFrameSource(&depthFrameSource));
+	CHECKERROR(depthFrameSource->OpenReader(&depthFrameReader));
+	SAFERELEASE(depthFrameSource);
 	return 0;
 }
 
@@ -699,6 +626,34 @@ int KinectV2SDKDepth::setProperty(std::string name, boost::any value)
 	}
 	*/
 	return -1;
+}
+
+int KinectV2SDKDepth::getSDKCalibrationModel(IntrinsicParameter & intrinsic)
+{
+	HRESULT hResult = S_OK;
+	// Coordinate Mapper
+	ICoordinateMapper* pCoordinateMapper;
+	hResult = kinectSensor->get_CoordinateMapper(&pCoordinateMapper);
+	if (FAILED(hResult)) {
+		std::cerr << "Error : IKinectSensor::get_CoordinateMapper()" << std::endl;
+	}
+	CameraIntrinsics* CI = new CameraIntrinsics();
+	hResult = pCoordinateMapper->GetDepthCameraIntrinsics(CI);
+	if (FAILED(hResult)) {
+		std::cerr << "Error : pCoordinateMapper::GetDepthCameraIntrinsics()" << std::endl;
+	}
+
+	if (CI->FocalLengthX != 0) {
+		intrinsic.focalLengthX = CI->FocalLengthX;
+		intrinsic.focalLengthY = CI->FocalLengthY;
+		intrinsic.opticalCenterX = CI->PrincipalPointX;
+		intrinsic.opticalCenterY = CI->PrincipalPointY;
+		return 0;
+	}
+	else {
+		return -1;
+	}
+
 }
 
 

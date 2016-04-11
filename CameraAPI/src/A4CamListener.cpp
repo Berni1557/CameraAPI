@@ -25,3 +25,4 @@ int A4CamListener::onframe(QImage qimage)
 
 	return 0;
 }
+  

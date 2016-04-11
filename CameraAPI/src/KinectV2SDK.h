@@ -85,6 +85,7 @@ private:
 	//PXCSenseManager* psm;
 	unsigned char * rgb_data;
 	IColorFrameReader* colorFrameReader = nullptr; // color reader
+	IKinectSensor* kinectSensor;
 
 	// Operations
 public:
@@ -117,8 +118,9 @@ public:
 private:
 	//PXCSenseManager* psm;
 	short * depth_data;
-	IColorFrameReader* colorFrameReader = nullptr; // color reader
-	
+	IDepthFrameReader* depthFrameReader = nullptr; // color reader
+	IKinectSensor* kinectSensor;
+
 	// Operations
 public:
 	KinectV2SDKDepth();
@@ -132,7 +134,7 @@ public:
 	int createProperties();
 	int setProperties();
 	int setProperty(std::string name, boost::any value);
-
+	int getSDKCalibrationModel(IntrinsicParameter& intrinsic);
 };
 
 /// class IntelRealsenseF200SDK - 

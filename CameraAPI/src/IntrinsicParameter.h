@@ -34,9 +34,14 @@ public:
   double focalLengthX;
   double focalLengthY;
   double opticalCenterX;
-  /// opticalCenter in y direction
   double opticalCenterY;
   double aspectRatio;
+
+  double focalLengthXDefault;
+  double focalLengthYDefault;
+  double opticalCenterXDefault;
+  double opticalCenterYDefault;
+  double aspectRatioDefault;
   // Operations
 public:
   IntrinsicParameter ();
